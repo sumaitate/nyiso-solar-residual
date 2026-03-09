@@ -1,2 +1,4 @@
 *.ipynb linguist-generated
+data/** linguist-generated
+reports/figures/** linguist-generated
 
