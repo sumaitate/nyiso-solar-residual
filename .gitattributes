@@ -1,4 +1,6 @@
 *.ipynb linguist-generated
 data/** linguist-generated
 reports/figures/** linguist-generated
-
+docs/** linguist-documentation
+references/** linguist-documentation
+*.py linguist-language=Python
