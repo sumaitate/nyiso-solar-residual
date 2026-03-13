@@ -188,4 +188,14 @@ cython_debug/
 .ruff_cache/
 
 # PyPI configuration file
-.pypirc
+.pypircnyiso-venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+notebooks/AutogluonModels/
+
+nyiso-venv/
+notebooks/AutogluonModels/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
