@@ -199,3 +199,7 @@ notebooks/AutogluonModels/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+nyiso/
+notebooks/catboost_info/
+.ipynb_checkpoints/
+__pycache__/
