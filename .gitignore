@@ -186,20 +186,31 @@ cython_debug/
 
 # Ruff stuff:
 .ruff_cache/
-
 # PyPI configuration file
-.pypircnyiso-venv/
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-notebooks/AutogluonModels/
+.pypirc
 
+# virtual environments
+.venv
+.venv/
+.venv-*/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 nyiso-venv/
-notebooks/AutogluonModels/
+.venv-nyiso-pc/
+
+# caches
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-nyiso/
+
+# generated model/output folders
+models/
+notebooks/AutogluonModels/
 notebooks/catboost_info/
-.ipynb_checkpoints/
-__pycache__/
+
+# project data
+/data/
+nyiso/
