@@ -1,7 +1,8 @@
 """
 dataset.py
-Functions for extracting raw NYISO archives and loading CSV folders
-into DataFrames. Importable by notebooks and by make data targets.
+functions for extracting raw nyiso archives, loading csv folders,
+parsing timestamps, and resolving column schemas.
+importable by notebooks and by make data targets.
 """
 
 import os
@@ -15,26 +16,26 @@ from solar_forecast.config import TS_COL, ZONE_COL
 
 
 def unzip_main_archive(zip_path: Path, output_root: Path) -> None:
-    """Extract the top-level NYISO solar ZIP into output_root."""
+    """extract the top-level nyiso solar zip into output_root."""
     if zip_path.exists():
         output_root.mkdir(parents=True, exist_ok=True)
         try:
             with zipfile.ZipFile(zip_path, "r") as archive:
                 archive.extractall(output_root)
-            logger.info(f"Extracted Main: {zip_path}")
+            logger.info(f"extracted main: {zip_path}")
         except Exception as e:
-            logger.error(f"Didn't Extract Main: {zip_path.name} | {e}")
+            logger.error(f"didn't extract main: {zip_path.name} | {e}")
     else:
-        logger.warning(f"Not Found: {zip_path}")
+        logger.warning(f"not found: {zip_path}")
 
 
 def unzip_all_archives(input_folder: Path, output_folder: Path) -> None:
-    """Extract every ZIP file in input_folder into output_folder."""
+    """extract every zip file in input_folder into output_folder."""
     os.makedirs(output_folder, exist_ok=True)
     extracted = 0
 
     if not input_folder.exists():
-        logger.warning(f"Input folder not found: {input_folder}")
+        logger.warning(f"input folder not found: {input_folder}")
         return
 
     for filename in os.listdir(input_folder):
@@ -44,16 +45,16 @@ def unzip_all_archives(input_folder: Path, output_folder: Path) -> None:
                     archive.extractall(output_folder)
                     extracted += 1
             except Exception as e:
-                logger.error(f"Did Not Extract: {filename} | {e}")
+                logger.error(f"did not extract: {filename} | {e}")
 
-    logger.info(f"Extraction Completed: {extracted} archives from {input_folder}")
+    logger.info(f"extraction completed: {extracted} archives from {input_folder}")
 
 
 def load_folder(folder: Path) -> pd.DataFrame:
     """
-    Read every CSV in folder into a single concatenated DataFrame.
-    Appends source_file column for traceability.
-    Returns an empty DataFrame if no CSVs are found.
+    read every csv in folder into a single concatenated dataframe.
+    appends source_file column for traceability.
+    returns an empty dataframe if no csvs are found.
     """
     csv_files = list(folder.glob("*.csv"))
     frames = []
@@ -64,28 +65,28 @@ def load_folder(folder: Path) -> pd.DataFrame:
             df["source_file"] = file.name
             frames.append(df)
         except Exception as e:
-            logger.error(f"Failed to Read: {file.name} | {e}")
+            logger.error(f"failed to read: {file.name} | {e}")
 
     if not frames:
-        logger.warning(f"No CSV files found in: {folder}")
+        logger.warning(f"no csv files found in: {folder}")
         return pd.DataFrame()
 
     return pd.concat(frames, ignore_index=True)
 
 
 def ensure_required_columns(df: pd.DataFrame, df_name: str) -> None:
-    """Raise KeyError if time_stamp or zone_name are missing."""
+    """raise keyerror if time_stamp or zone_name are missing."""
     missing = [col for col in [TS_COL, ZONE_COL] if col not in df.columns]
     if missing:
         raise KeyError(
             f"{df_name} is missing required columns: {missing}. "
-            f"Found: {df.columns.tolist()}"
+            f"found: {df.columns.tolist()}"
         )
 
 
 def resolve_value_col(df: pd.DataFrame) -> str:
     """
-    Return the name of the megawatt value column by checking a
+    return the name of the megawatt value column by checking a
     priority list of known candidates, then falling back to the
     first numeric column that is not a key or metadata column.
     """
@@ -108,5 +109,74 @@ def resolve_value_col(df: pd.DataFrame) -> str:
         return numeric_candidates[0]
 
     raise KeyError(
-        f"No megawatts column found. Available columns: {df.columns.tolist()}"
+        f"no megawatts column found. available columns: {df.columns.tolist()}"
     )
+
+
+def parse_nyiso_time(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    convert nyiso local timestamps to utc-aware hourly timestamps.
+    handles est (etc/gmt+5) and edt (etc/gmt+4) fixed-offset localization
+    where a time_zone column is present, falling back to america/new_york
+    for any unlabeled rows. floors all timestamps to the hour boundary.
+    normalizes zone_name to uppercase with collapsed whitespace.
+    """
+    df = df.copy()
+
+    raw_ts    = pd.to_datetime(df[TS_COL], errors="coerce")
+    parsed_ts = pd.Series(pd.NaT, index=df.index, dtype="object")
+
+    if "time_zone" in df.columns:
+        tz_series  = df["time_zone"].astype(str).str.upper().str.strip()
+
+        is_est     = tz_series.eq("EST")
+        is_edt     = tz_series.eq("EDT")
+        other_mask = ~(is_est | is_edt)
+
+        if is_est.any():
+            parsed_ts.loc[is_est] = (
+                pd.to_datetime(df.loc[is_est, TS_COL], errors="coerce")
+                .dt.tz_localize("Etc/GMT+5", nonexistent="shift_forward", ambiguous="NaT")
+                .dt.tz_convert("UTC")
+            )
+
+        if is_edt.any():
+            parsed_ts.loc[is_edt] = (
+                pd.to_datetime(df.loc[is_edt, TS_COL], errors="coerce")
+                .dt.tz_localize("Etc/GMT+4", nonexistent="shift_forward", ambiguous="NaT")
+                .dt.tz_convert("UTC")
+            )
+
+        if other_mask.any():
+            parsed_ts.loc[other_mask] = (
+                pd.to_datetime(df.loc[other_mask, TS_COL], errors="coerce")
+                .dt.tz_localize(
+                    "America/New_York",
+                    nonexistent="shift_forward",
+                    ambiguous="NaT",
+                )
+                .dt.tz_convert("UTC")
+            )
+    else:
+        parsed_ts = (
+            raw_ts
+            .dt.tz_localize(
+                "America/New_York",
+                nonexistent="shift_forward",
+                ambiguous="NaT",
+            )
+            .dt.tz_convert("UTC")
+            .astype("object")
+        )
+
+    df[TS_COL] = pd.to_datetime(parsed_ts, utc=True, errors="coerce").dt.floor("h")
+
+    df[ZONE_COL] = (
+        df[ZONE_COL]
+        .astype(str)
+        .str.upper()
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True)
+    )
+
+    return df
