@@ -1,22 +1,16 @@
 """
-dataset.py
-functions for extracting raw nyiso archives, loading csv folders,
-parsing timestamps, and resolving column schemas.
-importable by notebooks and by make data targets.
+Extract, Load, and Parse Raw NYISO Solar and Weather Data
 """
 
 import os
 import zipfile
 from pathlib import Path
-
 import pandas as pd
 from loguru import logger
 
 from solar_forecast.config import TS_COL, ZONE_COL
 
-
 def unzip_main_archive(zip_path: Path, output_root: Path) -> None:
-    """extract the top-level nyiso solar zip into output_root."""
     if zip_path.exists():
         output_root.mkdir(parents=True, exist_ok=True)
         try:
@@ -30,7 +24,6 @@ def unzip_main_archive(zip_path: Path, output_root: Path) -> None:
 
 
 def unzip_all_archives(input_folder: Path, output_folder: Path) -> None:
-    """extract every zip file in input_folder into output_folder."""
     os.makedirs(output_folder, exist_ok=True)
     extracted = 0
 
@@ -51,11 +44,6 @@ def unzip_all_archives(input_folder: Path, output_folder: Path) -> None:
 
 
 def load_folder(folder: Path) -> pd.DataFrame:
-    """
-    read every csv in folder into a single concatenated dataframe.
-    appends source_file column for traceability.
-    returns an empty dataframe if no csvs are found.
-    """
     csv_files = list(folder.glob("*.csv"))
     frames = []
 
@@ -75,7 +63,6 @@ def load_folder(folder: Path) -> pd.DataFrame:
 
 
 def ensure_required_columns(df: pd.DataFrame, df_name: str) -> None:
-    """raise keyerror if time_stamp or zone_name are missing."""
     missing = [col for col in [TS_COL, ZONE_COL] if col not in df.columns]
     if missing:
         raise KeyError(
@@ -85,11 +72,6 @@ def ensure_required_columns(df: pd.DataFrame, df_name: str) -> None:
 
 
 def resolve_value_col(df: pd.DataFrame) -> str:
-    """
-    return the name of the megawatt value column by checking a
-    priority list of known candidates, then falling back to the
-    first numeric column that is not a key or metadata column.
-    """
     candidates = [
         "mw_value", "mw", "value",
         "actual_mw", "forecast_mw", "capacity_mw", "name",
@@ -114,13 +96,6 @@ def resolve_value_col(df: pd.DataFrame) -> str:
 
 
 def parse_nyiso_time(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    convert nyiso local timestamps to utc-aware hourly timestamps.
-    handles est (etc/gmt+5) and edt (etc/gmt+4) fixed-offset localization
-    where a time_zone column is present, falling back to america/new_york
-    for any unlabeled rows. floors all timestamps to the hour boundary.
-    normalizes zone_name to uppercase with collapsed whitespace.
-    """
     df = df.copy()
 
     raw_ts    = pd.to_datetime(df[TS_COL], errors="coerce")
