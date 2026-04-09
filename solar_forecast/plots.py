@@ -1,7 +1,5 @@
 """
-plots.py
-Reusable plot functions for EDA and error analysis.
-Importable by notebooks and by reporting scripts.
+Reusable Visualization Functions
 """
 
 import matplotlib.pyplot as plt
