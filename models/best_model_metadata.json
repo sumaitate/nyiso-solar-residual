@@ -1,0 +1,13 @@
+{
+  "model_name": "Random Forest Residual Model (Tuned)",
+  "model_type": "statistical_climatology",
+  "saved_date": "2026-04-09T18:54:17.561915",
+  "test_metrics": {
+    "mae": 97.41529851952912,
+    "rmse": 195.92692995493823,
+    "daylight_mae": 112.09031130420036,
+    "mae_improvement_pct": 5.4
+  },
+  "description": "Month-Hour Residual Climatology: computes average forecast residuals by (month, hour) from training data, with fallback to hourly and global mean.",
+  "how_to_use": "Load tuned_validation_results.csv and tuned_test_results.csv; apply month-hour residual correction to NYISO baseline forecasts."
+}
