@@ -50,7 +50,7 @@ src = ["solar_forecast"]
 include = ["pyproject.toml", "solar_forecast/**/*.py"]
 
 [tool.ruff.lint]
-extend-select = ["I"]  # Add import sorting
+extend-select = ["I"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["solar_forecast"]

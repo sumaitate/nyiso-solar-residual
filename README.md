@@ -8,6 +8,7 @@ The New York Independent System Operator (NYISO) releases solar forecasts, but t
 
 ---
 ## Overview
+
 ### Problem Statement
 NYISO produces baseline solar forecasts for the electric grid, but these forecasts contain systematic errors that can reduce grid reliability and increase operational costs. When forecasts deviate significantly from actual solar generation, grid operators have to deploy expensive backup resources or risk blackouts. This project addresses whether machine learning can minimize forecast errors by learning patterns in the difference between what NYISO predicts and what actually happens, rather than trying to predict solar generation from scratch.
 
@@ -87,6 +88,7 @@ Weather features come from ERA5 reanalysis at coarse spatial resolution, which m
 The Month-Hour Climatology approach relies on historical averages and can't adapt to novel weather patterns or unprecedented system states outside the training distribution. Forecast errors during morning and evening ramp periods (6–10 AM and 4–6 PM) remain difficult to minimize, suggesting residual learning alone cannot capture rapid cloud cover or atmospheric changes. The model shows no improvement during nighttime hours when solar output is zero, as residual errors are zero by definition during darkness.
 
 ### Interpretation
+
 #### Learnable Forecast Bias
 The Month-Hour Climatology model's success over other more complex modeling approaches indicates that NYISO's forecast errors follow primarily seasonal and diurnal patterns rather than complex weather-dependent dynamics. The strong midday improvement (11–25 MW MAE reduction) reflects a consistent systematic underestimation during peak generation hours that the climatology approach addresses and corrects.
 
