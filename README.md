@@ -10,10 +10,10 @@ The New York Independent System Operator (NYISO) releases solar forecasts, but t
 ## Overview
 
 ### Problem Statement
-NYISO produces baseline solar forecasts for the electric grid, but these forecasts contain systematic errors that can reduce grid reliability and increase operational costs. When forecasts deviate significantly from actual solar generation, grid operators have to deploy expensive backup resources or risk blackouts. This project addresses whether machine learning can minimize forecast errors by learning patterns in the difference between what NYISO predicts and what actually happens, rather than trying to predict solar generation from scratch.
+NYISO produces baseline solar forecasts for the electric grid, but these forecasts contain systematic errors that can reduce grid reliability and increase operational costs. When forecasts deviate significantly from actual solar generation, grid operators have to deploy expensive backup resources or risk blackouts. This project addresses whether machine learning can minimize forecast errors by learning patterns in the difference between what NYISO predicts and what actually happens, instead of trying to predict solar generation from scratch.
 
 ### Research Question
-Can a machine learning model trained on forecast residuals combined with ERA5 weather features produce more accurate predictions than the baseline NYISO forecast alone?
+Can machine learning models trained on forecast residuals combined with ERA5 weather features produce more accurate predictions than the baseline forecast NYISO produces?
 
 ### Key Contributions
 * Month-Hour Residual Climatology model outperforms ML baselines
@@ -33,14 +33,14 @@ The merged dataset includes 12 columns: timestamps, generation in megawatts, and
 weather variables (temperature, pressure, cloud cover, wind speed, shortwave radiation). 
 Missing data rates are low (1.7% in generation, <0.7% in forecasts).
 
-The original data processing pipeline is in notebooks/ but not currently documented. 
+The original data processing pipeline is in notebooks/ but not fully documented yet. 
 A formal reproducibility guide will be added in a future update.
 
 ### Methodology
 The main strategy models forecast errors as residuals—the difference between actual solar generation and NYISO's  forecast—rather than predicting generation from scratch. This residual becomes the target variable that  models learn to predict.
 
 #### Feature Engineering
-In the feature engineering step, 25 physics-informed features capture solar generation patterns. The use of sine and cosine transformations preserve temporal continuity by hourly phase (24-hour cycle), month (12-month cycle), and day of year (365.25-day cycle). These features interact with weather features such as: shortwave radiation multiplied by cloud cover, shortwave radiation multiplied by temperature, and forecast magnitude multiplied by hourly phase. Rolling averages capture short-term momentum using three-hour and 24-hour windows of both forecast and radiation. Change features measure volatility through first-order differences and absolute ramps in radiation. Binary regime flags identify morning ramp periods (6–9 AM) and midday hours (10–2 PM), when forecast errors are systematically largest.
+In the feature engineering step, 25 physics-informed features capture solar generation patterns. The use of sine and cosine transformations preserve temporal continuity by hourly phase (24-hour cycle), month (12-month cycle), and day of year (365.25-day cycle). These features interact with the weather features such as: shortwave radiation multiplied by cloud cover, shortwave radiation multiplied by temperature, and forecast magnitude multiplied by hourly phase. Rolling averages capture short-term momentum using three-hour and 24-hour windows of both forecast and radiation. Change features measure volatility through first-order differences and absolute ramps in radiation. Binary regime flags identify morning ramp periods (6–9 AM) and midday hours (10–2 PM), when forecast errors are systematically largest.
 
 #### Data Splitting
 The dataset splits at July 1, 2024: 30,922 training records before that date and 
