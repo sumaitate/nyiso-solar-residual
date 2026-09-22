@@ -6,6 +6,7 @@
 
 The New York Independent System Operator (NYISO) releases solar forecasts, but these contain errors. This project uses machine learning with weather features to predict and correct those forecast errors for a more accurate forecast.
 
+CURRENTLY BEING MODIFIED
 ---
 ## Overview
 
