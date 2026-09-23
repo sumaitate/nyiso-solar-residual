@@ -6,7 +6,6 @@
 
 The New York Independent System Operator (NYISO) releases solar forecasts, but these contain errors. This project uses machine learning with weather features to predict and correct those forecast errors for a more accurate forecast.
 
-CURRENTLY BEING MODIFIED
 ---
 ## Overview
 
@@ -129,7 +128,7 @@ The 5.4% MAE reduction (5.8 MW absolute error on a 584 MW system average) is mod
 ├── pyproject.toml  
 ├── references  
 │
-├── reports   <- View final report and PowerPoint here.
+├── reports  
 │   └── figures 
 │
 ├── requirements.txt 
