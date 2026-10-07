@@ -1,0 +1,33 @@
+{
+  "data/processed/01_nyiso_merged.csv": {
+    "sha256": "01d80acbc6631df2ccfd083bccd23ea354cbc21cac99ac90cee48c202a13c45c",
+    "rows": 509412,
+    "columns": 5,
+    "start": "2020-11-17 00:00:00+00:00",
+    "end": "2025-09-20 23:00:00+00:00",
+    "missing_timestamps": 0,
+    "duplicate_timestamps": 466961
+  },
+  "data/processed/03_merged_data.csv": {
+    "sha256": "b274db370fef959dd44d221bfcf88278edce78c853cafc829be54ac88e882806",
+    "rows": 509412,
+    "columns": 12,
+    "start": "2020-11-17 00:00:00+00:00",
+    "end": "2025-09-20 23:00:00+00:00",
+    "missing_timestamps": 0,
+    "duplicate_timestamps": 466961
+  },
+  "data/processed/04_system_model_ready_data.csv": {
+    "sha256": "e5c7cf609ff217a137d9d688427815db6be0a5e9e5ef8ac7501337953bd46413",
+    "rows": 41451,
+    "columns": 31,
+    "start": "2020-11-17 00:00:00+00:00",
+    "end": "2025-09-18 23:00:00+00:00",
+    "missing_timestamps": 0,
+    "duplicate_timestamps": 0,
+    "dataset_split": {
+      "train": 30922,
+      "test": 10529
+    }
+  }
+}
