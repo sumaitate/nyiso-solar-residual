@@ -1,21 +1,14 @@
 from pathlib import Path
 import pickle
-import pandas as pd
+
 from loguru import logger
+import pandas as pd
 import typer
 
 from solar_forecast.config import MODEL_READY_OUT, MODEL_ROOT
+from solar_forecast.modeling.baselines import fit_month_hour_climatology
 
 app = typer.Typer()
-
-
-def fit_mh_clim(fit_df, target_col="forecast_error_mw"):
-    """Fit Month-Hour Residual Climatology model"""
-    mh_map = fit_df.groupby(["month_local", "hour_local"])[target_col].mean()
-    hour_map = fit_df.groupby("hour_local")[target_col].mean()
-    global_mean = fit_df[target_col].mean()
-    return mh_map, hour_map, global_mean
-
 
 @app.command()
 def main(
@@ -44,8 +37,12 @@ def main(
     logger.info(f"Training set shape: {train_df.shape}")
     
     logger.info("Fitting Month-Hour Residual Climatology model...")
-    mh_map, hour_map, global_mean = fit_mh_clim(train_df, target_col="forecast_error_mw")
-    
+
+    mh_map, hour_map, global_mean = fit_month_hour_climatology(
+        train_df,
+        target_col="forecast_error_mw",
+    )
+
     model_data = {
         "mh_map": mh_map,
         "hour_map": hour_map,
