@@ -1,24 +1,29 @@
 from pathlib import Path
-import pandas as pd
+
 from loguru import logger
+import pandas as pd
 import typer
 
 from solar_forecast.config import (
+    ERA5_OUT,
+    MERGED_OUT,
+    NYISO_OUT,
     PROCESSED_ROOT,
     SOLAR_RAW_ROOT,
     SOLAR_ZIP_PATH,
     UNZIPPED_ROOTS,
-    NYISO_OUT,
-    ERA5_OUT,
-    MERGED_OUT,
+)
+from solar_forecast.config import (
     TS_COL as ts_col,
+)
+from solar_forecast.config import (
     ZONE_COL as zone_col,
 )
-
 from solar_forecast.dataset import (
-    unzip_main_archive,
-    unzip_all_archives,
     load_folder,
+    parse_nyiso_time,
+    unzip_all_archives,
+    unzip_main_archive,
 )
 
 app = typer.Typer()
@@ -49,8 +54,9 @@ def extract_and_prepare_nyiso() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFram
             .str.replace("-", "_", regex=False)
         )
 
-    for df in (df_actual, df_forecast, df_capacity):
-        df[ts_col] = pd.to_datetime(df[ts_col], format="%m/%d/%Y %H:%M", errors="coerce")
+    df_actual = parse_nyiso_time(df_actual)
+    df_forecast = parse_nyiso_time(df_forecast)
+    df_capacity = parse_nyiso_time(df_capacity)
 
     for df in (df_actual, df_forecast, df_capacity):
         for col in df.select_dtypes(include="object").columns:
