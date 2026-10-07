@@ -1,10 +1,14 @@
 from pathlib import Path
 import pickle
-import pandas as pd
+
 from loguru import logger
+import pandas as pd
 import typer
 
 from solar_forecast.config import MODEL_READY_OUT, MODEL_ROOT
+from solar_forecast.modeling.baselines import (
+    predict_month_hour_climatology,
+)
 
 app = typer.Typer()
 
@@ -54,12 +58,12 @@ def main(
         model_data = pickle.load(f)
     
     logger.info("Generating predictions...")
-    corrected_forecast = predict_mh_clim(
+    corrected_forecast = predict_month_hour_climatology(
         eval_df,
         model_data["mh_map"],
         model_data["hour_map"],
         model_data["global_mean"],
-    )
+    ).clip(lower=0.0)
     
     results_df = eval_df[[
         "time_stamp",
