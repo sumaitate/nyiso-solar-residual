@@ -102,12 +102,16 @@ The major improvements in summer and fall (9.3–13.8 MW) compared to variable p
 The 5.4% MAE reduction (5.8 MW absolute error on a 584 MW system average) is modest in percentage terms but concentrated during high-generation hours when reserve costs and grid stress are greatest. The model improves 35% of predictions while degrading only 24%, suggesting that selective application—using corrected forecasts when error magnitude is largest and reverting to NYISO baseline otherwise—could provide practical operational benefits without systematic performance loss.
 
 ---
+## Reproducibility 
+All setup instructions, required data, and execution steps are documented in: REPRODUCE.md
+
+---
 ## Repository Structure
 
 ```
 ├── LICENSE            
-├── Makefile           
-├── README.md          <- You are here.
+├── README.md
+├── REPRODUCE.md
 ├── data
 │   ├── external       
 │   ├── interim        
